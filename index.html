@@ -922,7 +922,13 @@ body.easy-active::-webkit-scrollbar {
   background:#1a1a1a; border:1px solid #444; border-radius:10px; padding:16px; width:280px;
   box-shadow:0 4px 20px rgba(0,0,0,0.6);">
   <h3 style="margin:0 0 12px 0; font-size:14px;">🎛️ LTC Generator</h3>
-  <div style="font-size:12px; color:#888; margin-bottom:8px;">10:00:00:00 · 25fps · 48kHz 16bit</div>
+  <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+  <button class="btn sq" id="ltcHourDown" style="font-size:16px; padding:0; width:28px; height:28px;">◀</button>
+  <span id="ltcHourDisplay" style="font-size:13px; color:#aaa; min-width:90px; text-align:center;">10:00:00:00</span>
+  <button class="btn sq" id="ltcHourUp" style="font-size:16px; padding:0; width:28px; height:28px;">▶</button>
+  <span style="font-size:11px; color:#666;">· 25fps · 48kHz</span>
+</div>
+
   <div style="display:flex; flex-direction:column; gap:8px;">
     <button class="btn" id="ltcGenBtn" style="font-size:13px;">⚡ Générer LTC</button>
     <button class="btn" id="ltcLoadBtn" style="font-size:13px;">📂 Charger fichier LTC</button>
@@ -2137,27 +2143,46 @@ document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('ltcStatus').textContent = '✅ Fichier LTC chargé : ' + f.name;
   };
 
+  // Heure LTC sélectionnée
+  let ltcStartHour = 10;
+  function updateLtcHourDisplay(){
+    document.getElementById('ltcHourDisplay').textContent =
+      String(ltcStartHour).padStart(2,'0') + ':00:00:00';
+  }
+  document.getElementById('ltcHourDown').onclick = () => {
+    ltcStartHour = (ltcStartHour - 1 + 24) % 24;
+    updateLtcHourDisplay();
+  };
+  document.getElementById('ltcHourUp').onclick = () => {
+    ltcStartHour = (ltcStartHour + 1) % 24;
+    updateLtcHourDisplay();
+  };
+
   // Générer LTC WAV
   document.getElementById('ltcGenBtn').onclick = async () => {
-  const mainAudio = document.getElementById('audio');
-  let duration = mainAudio && isFinite(mainAudio.duration) ? mainAudio.duration : 0;
-  if(!duration || duration < 1){
-    document.getElementById('ltcStatus').textContent = '⚠️ Charge d\'abord un fichier audio';
-    return;
-  }
-  const ltcDuration = Math.ceil(duration) + 10;
-  document.getElementById('ltcStatus').textContent = `⏳ Génération ${ltcDuration}s...`;
-  await new Promise(r => setTimeout(r, 50));
-  try {
-    const url = await generateLTCWavAsync(ltcDuration, LTC_FPS, LTC_SR, LTC_OFFSET * LTC_FPS);
-    setupLTCAudio(url);
-    const mm = Math.floor(ltcDuration/60), ss = ltcDuration%60;
-    document.getElementById('ltcStatus').textContent = `✅ LTC généré (${mm}:${ss.toString().padStart(2,'0')}, start 10:00:00:00)`;
-  } catch(err) {
-    document.getElementById('ltcStatus').textContent = '❌ ' + err.message;
-    console.error(err);
-  }
-};
+    const mainAudio = document.getElementById('audio');
+    let duration = mainAudio && isFinite(mainAudio.duration) ? mainAudio.duration : 0;
+    if(!duration || duration < 1){
+      document.getElementById('ltcStatus').textContent = '⚠️ Charge d\'abord un fichier audio';
+      return;
+    }
+    const ltcOffsetFrames = ltcStartHour * 3600 * LTC_FPS;
+    const ltcDuration = Math.ceil(duration) + 10;
+    document.getElementById('ltcStatus').textContent = `⏳ Génération ${ltcDuration}s...`;
+    await new Promise(r => setTimeout(r, 50));
+    try {
+      const url = await generateLTCWavAsync(ltcDuration, LTC_FPS, LTC_SR, ltcOffsetFrames);
+      setupLTCAudio(url);
+      const mm = Math.floor(ltcDuration/60), ss = ltcDuration%60;
+      document.getElementById('ltcStatus').textContent =
+        `✅ LTC généré (${mm}:${ss.toString().padStart(2,'0')}, start ${String(ltcStartHour).padStart(2,'0')}:00:00:00)`;
+    } catch(err) {
+      document.getElementById('ltcStatus').textContent = '❌ ' + err.message;
+      console.error(err);
+    }
+  };
+
+
 
 
   // Listener radios routing
