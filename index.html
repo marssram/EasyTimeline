@@ -1286,6 +1286,31 @@ const totalW = Math.max(contentEnd * state.pxPerSec, track.clientWidth || 800);
 
   inner.style.width = totalW + 'px';
 
+  // Bloc NO AUDIO TRACK si pas d'audio
+  const noAudioId = 'noAudioBlock_' + id;
+  let noAudioEl = document.getElementById(noAudioId);
+  if (!isFinite(audio.duration) || audio.duration <= 0) {
+    if (!noAudioEl) {
+      noAudioEl = document.createElement('div');
+      noAudioEl.id = noAudioId;
+      noAudioEl.style.cssText = `
+        position:absolute; top:50%; transform:translateY(-50%);
+        left:20px; padding:6px 16px; border-radius:6px;
+        background:rgba(255,255,255,0.07); border:1px dashed rgba(255,255,255,0.2);
+        color:rgba(255,255,255,0.35); font-size:12px; letter-spacing:2px;
+        pointer-events:none; display:flex; gap:12px; align-items:center;
+      `;
+      noAudioEl.innerHTML = `
+        <span>NO AUDIO TRACK</span>
+        <span style="font-family:monospace; font-size:13px; color:rgba(255,255,255,0.25);">10:00:00:00</span>
+      `;
+      inner.appendChild(noAudioEl);
+    }
+  } else {
+    if (noAudioEl) noAudioEl.remove();
+  }
+
+
   // Supprimer anciens blocs (garder curseur)
   Array.from(inner.children).forEach(c => { if(!c.classList.contains('cursor')) inner.removeChild(c); });
 
