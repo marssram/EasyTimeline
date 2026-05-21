@@ -1635,18 +1635,34 @@ audio.addEventListener('timeupdate', () => {
   updateCursors(); updateTimeBadge(); autoSelect(); autoScroll(audio.currentTime);
 });
 audio.addEventListener('ended', () => {
-  state.isPlaying = false; document.getElementById('playBtn').textContent = '▶️';
+  state.isPlaying = false; 
+  document.getElementById('playBtn').textContent = '▶️';
+  document.getElementById('easyPlay').textContent = '▶️';
 });
 
 /* =====================================================
    LECTURE
    ===================================================== */
 let moveInterval = null;
-document.getElementById('playBtn').onclick = () => {
+
+// Play button - Mode Normal (simple clic)
+document.getElementById('playBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
   if(!isFinite(audio.duration)){ setStatus('Importe un audio !'); return; }
-  if(state.isPlaying){ audio.pause(); state.isPlaying=false; document.getElementById('playBtn').textContent='▶️'; }
-  else { audio.play(); state.isPlaying=true; document.getElementById('playBtn').textContent='⏸️'; }
-};
+  if(state.isPlaying){ 
+    audio.pause(); 
+    state.isPlaying = false; 
+    document.getElementById('playBtn').textContent = '▶️';
+    document.getElementById('easyPlay').textContent = '▶️';
+  } else { 
+    audio.play(); 
+    state.isPlaying = true; 
+    document.getElementById('playBtn').textContent = '⏸️';
+    document.getElementById('easyPlay').textContent = '⏸️';
+  }
+});
+
+// Avance/recul continu au toucher/souris
 function startMove(dir, fast){
   stopMove();
   moveInterval = setInterval(()=>{
@@ -1656,18 +1672,32 @@ function startMove(dir, fast){
   }, 16);
 }
 function stopMove(){ clearInterval(moveInterval); }
-document.getElementById('lBtn').onmousedown  = ()=>startMove(-1,false);
-document.getElementById('rBtn').onmousedown  = ()=>startMove(1,false);
-document.getElementById('llBtn').onmousedown = ()=>startMove(-1,true);
-document.getElementById('rrBtn').onmousedown = ()=>startMove(1,true);
+
+// Mode Normal - souris/tactile
+document.getElementById('lBtn').addEventListener('touchstart', () => startMove(-1, false));
+document.getElementById('lBtn').addEventListener('mousedown', () => startMove(-1, false));
+document.getElementById('rBtn').addEventListener('touchstart', () => startMove(1, false));
+document.getElementById('rBtn').addEventListener('mousedown', () => startMove(1, false));
+document.getElementById('llBtn').addEventListener('touchstart', () => startMove(-1, true));
+document.getElementById('llBtn').addEventListener('mousedown', () => startMove(-1, true));
+document.getElementById('rrBtn').addEventListener('touchstart', () => startMove(1, true));
+document.getElementById('rrBtn').addEventListener('mousedown', () => startMove(1, true));
+
+document.addEventListener('touchend', stopMove);
 window.addEventListener('mouseup', stopMove);
 
-document.getElementById('snapBtn').onclick = () => {
+// Snap
+document.getElementById('snapBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
   const b = getTL().sel; if(!b) return;
-  audio.currentTime = b.start; updateCursors(); updateTimeBadge(); setStatus('Snap ⏮');
-};
+  audio.currentTime = b.start; 
+  updateCursors(); updateTimeBadge(); 
+  setStatus('Snap ⏮');
+});
 
-document.getElementById('prevBlockBtn').onclick = () => {
+// Navigation blocs
+document.getElementById('prevBlockBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
   const tl = getTL();
   if (!tl || !tl.blocks.length || !tl.sel) return;
   const idx = tl.blocks.indexOf(tl.sel);
@@ -1678,8 +1708,10 @@ document.getElementById('prevBlockBtn').onclick = () => {
     updatePanel(); renderAll(); saveToStorage();
     setStatus('◀ Bloc précédent');
   }
-};
-document.getElementById('nextBlockBtn').onclick = () => {
+});
+
+document.getElementById('nextBlockBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
   const tl = getTL();
   if (!tl || !tl.blocks.length || !tl.sel) return;
   const idx = tl.blocks.indexOf(tl.sel);
@@ -1690,7 +1722,7 @@ document.getElementById('nextBlockBtn').onclick = () => {
     updatePanel(); renderAll(); saveToStorage();
     setStatus('▶ Bloc suivant');
   }
-};
+});
 
 
 
@@ -2127,20 +2159,6 @@ function easyLoop(){
   easyRafId = requestAnimationFrame(easyLoop);
 }
 
-/* --- Mode Normal : contrôles tactiles simplifiés --- */
-document.getElementById('playBtn').addEventListener('click', function(e) {
-  e.stopPropagation();
-  if(!isFinite(audio.duration)) return;
-  if(state.isPlaying){
-    audio.pause(); state.isPlaying = false;
-    document.getElementById('playBtn').textContent = '▶️';
-    document.getElementById('easyPlay').textContent = '▶️';
-  } else {
-    audio.play(); state.isPlaying = true;
-    document.getElementById('playBtn').textContent = '⏸️';
-    document.getElementById('easyPlay').textContent = '⏸️';
-  }
-});
 
 // Boutons avance/recul (simple clic)
 document.getElementById('llBtn').addEventListener('click', (e) => {
@@ -2179,19 +2197,6 @@ document.getElementById('fitBtn').addEventListener('click', (e) => {
 });
 
 
-/* --- Contrôles Easy --- */
-document.getElementById('easyPlay').onclick = () => {
-  if(!isFinite(audio.duration)) return;
-  if(state.isPlaying){
-    audio.pause(); state.isPlaying = false;
-    document.getElementById('easyPlay').textContent = '▶️';
-    document.getElementById('playBtn').textContent  = '▶️';
-  } else {
-    audio.play(); state.isPlaying = true;
-    document.getElementById('easyPlay').textContent = '⏸️';
-    document.getElementById('playBtn').textContent  = '⏸️';
-  }
-};
 
 // Avance / recul continu (maintien)
 let easyMoveInt = null;
