@@ -41,6 +41,21 @@ body.light-mode .btn { background: linear-gradient(180deg,#f0f0f0,#ddd); color: 
 .snap-btn .snap-icon { font-size: 18px; line-height: 1; }
 .snap-btn .snap-label { font-size: 9px; letter-spacing: 1px; color: rgba(255,255,255,0.7); text-transform: uppercase; }
 
+@media (max-width: 600px) {
+  #projectName {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    font-size: 20px !important;
+    order: 3;
+    text-align: center;
+    padding: 4px 0;
+  }
+  .header {
+    justify-content: space-between;
+  }
+}
+
 
 .play-btn {
   width: 80px; height: 80px; border-radius: 20px; font-size: 30px;
