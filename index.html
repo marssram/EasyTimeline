@@ -2127,6 +2127,56 @@ function easyLoop(){
   easyRafId = requestAnimationFrame(easyLoop);
 }
 
+/* --- Mode Normal : contrôles tactiles simplifiés --- */
+document.getElementById('playBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  if(!isFinite(audio.duration)) return;
+  if(state.isPlaying){
+    audio.pause(); state.isPlaying = false;
+    document.getElementById('playBtn').textContent = '▶️';
+    document.getElementById('easyPlay').textContent = '▶️';
+  } else {
+    audio.play(); state.isPlaying = true;
+    document.getElementById('playBtn').textContent = '⏸️';
+    document.getElementById('easyPlay').textContent = '⏸️';
+  }
+});
+
+// Boutons avance/recul (simple clic)
+document.getElementById('llBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if(!isFinite(audio.duration)) return;
+  audio.currentTime = Math.max(0, audio.currentTime - 1);
+});
+
+document.getElementById('lBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if(!isFinite(audio.duration)) return;
+  audio.currentTime = Math.max(0, audio.currentTime - 0.1);
+});
+
+document.getElementById('rBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if(!isFinite(audio.duration)) return;
+  audio.currentTime = Math.min(audio.duration, audio.currentTime + 0.1);
+});
+
+document.getElementById('rrBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if(!isFinite(audio.duration)) return;
+  audio.currentTime = Math.min(audio.duration, audio.currentTime + 1);
+});
+
+// Snap et Fit
+document.getElementById('snapBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  snapToStart();
+});
+
+document.getElementById('fitBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  fitTimeline();
+});
 
 
 /* --- Contrôles Easy --- */
