@@ -869,8 +869,30 @@ body.easy-active {
   max-height: 100vh !important;
   position: fixed !important;
   width: 100% !important;
-  -webkit-overflow-scrolling: touch !important;
+  -webkit-overflow-scrolling: auto !important;
 }
+
+/* Timeline mini - VISIBLE en mobile */
+.easy-mini-timeline {
+  position: relative !important;
+  display: flex !important;
+  z-index: 10;
+  width: 100% !important;
+  height: 40px !important;
+  background: rgba(0,0,0,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255,255,255,0.3);
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .easy-mini-timeline {
+    height: 50px !important;
+  }
+}
+
 
 
 /* Cacher la scrollbar Webkit du html en easy mode */
